@@ -1,0 +1,156 @@
+{
+    "-- host":
+        "MQTT Broker Hostname oder IP",
+
+    "host": "mqtt.example.com",
+
+    "-- port":
+        "MQTT Port",
+
+    "port": 8883,
+
+
+
+    "-- username":
+        "MQTT Benutzername",
+
+    "username": "mqttuser",
+
+    "-- password":
+        "MQTT Passwort",
+
+    "password": "mqttpass",
+
+
+
+    "-- client_id":
+        "Optionale MQTT Client-ID",
+
+    "client_id": "mqtt-forwarder",
+
+
+
+    "-- tls":
+        "TLS aktivieren true/false",
+
+    "tls": true,
+
+    "-- tls_use_os_cert":
+        "Nutze OS Root CA Zertifikate",
+
+    "tls_use_os_cert": true,
+
+    "-- tls_insecure":
+        "Deaktiviert Zertifikatsprüfung (unsicher)",
+
+    "tls_insecure": false,
+
+    "-- ca_cert":
+        "Pfad zu eigener CA Datei wenn tls_use_os_cert=false",
+
+    "ca_cert": "/etc/ssl/myca.pem",
+
+
+
+    "-- keepalive":
+        "MQTT Keepalive Sekunden",
+
+    "keepalive": 60,
+
+
+
+    "-- subscribe_qos":
+        "QoS für Subscriptions",
+
+    "subscribe_qos": 0,
+
+
+
+    "-- subscribe_topics":
+        "Liste der MQTT Topics zum Subscribe",
+
+    "subscribe_topics": 0,
+
+    "-- Example: subscribe_topics = 0":
+        "Automatisch alle source_topic aus rules abonnieren",
+
+    "-- Example: subscribe_topics wildcard":
+        "#",
+
+    "-- Example: subscribe_topics array":
+        [
+            "topic1/#",
+            "topic2/dev1"
+        ],
+
+
+
+    "-- rules":
+        "Weiterleitungsregeln",
+
+
+
+    "rules": [
+
+        {
+            "-- source_topic":
+                "Nur Nachrichten dieses Topics verwenden",
+
+            "source_topic": "devices/device1/raw",
+
+
+            "-- starts_with":
+                "Payload muss mit diesem Präfix beginnen",
+
+            "starts_with": "TEMP:",
+
+
+            "-- target_topic":
+                "Zieltopic",
+
+            "target_topic": "sensor/device1/temp",
+
+
+            "-- remove_keyword":
+                "Entfernt Prefix vor Weiterleitung",
+
+            "remove_keyword": true,
+
+
+            "-- qos":
+                "Publish QoS",
+
+            "qos": 0,
+
+
+            "-- retain":
+                "MQTT retain flag",
+
+            "retain": false
+        },
+
+
+
+        {
+            "-- Example humidity":
+                "Weiterleitung Luftfeuchte",
+
+            "source_topic": "devices/device2/raw",
+            "starts_with": "HUM:",
+            "target_topic": "sensor/device2/humidity",
+            "remove_keyword": true
+        },
+
+
+
+        {
+            "-- Example alarm":
+                "Alarmmeldungen retained senden",
+
+            "source_topic": "alerts/raw",
+            "starts_with": "ALARM",
+            "target_topic": "alerts/active",
+            "retain": true
+        }
+    ]
+}
