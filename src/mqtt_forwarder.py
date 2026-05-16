@@ -80,9 +80,6 @@ class MQTTForwarder:
             []
         )
 
-        # Spezialfall:
-        # subscribe_topics = 0
-        # => alle source_topic aus rules verwenden
         if subscribe_topics == 0:
             topics = set()
 
@@ -146,17 +143,18 @@ class MQTTForwarder:
             keyword = rule.get("starts_with")
             target_topic = rule.get("target_topic")
 
-            if not keyword or not target_topic:
+            if not target_topic:
                 continue
 
-            if not payload.startswith(keyword):
-                continue
+            if keyword:
+                if not payload.startswith(keyword):
+                    continue
 
             matched = True
 
             new_payload = payload
 
-            if rule.get("remove_keyword", False):
+            if keyword and rule.get("remove_keyword", False):
                 new_payload = payload[len(keyword):].lstrip()
 
             qos = rule.get("qos", 0)
@@ -210,7 +208,7 @@ def load_config(path):
 
 
 def signal_handler(sig, frame):
-    print("\n[+] Beendet")
+    print("\\n[+] Beendet")
     sys.exit(0)
 
 
@@ -241,10 +239,9 @@ def parse_args():
     parser.add_argument(
         "-v",
         type=int,
-        default=3,
         choices=range(0, 10),
         metavar="0-9",
-        help="Verbosity 0..9"
+        help="Verbosity 0..9 (überschreibt config)"
     )
 
     return parser.parse_args()
@@ -263,16 +260,21 @@ def main():
 
     config = load_config(config_path)
 
-    # CLI überschreibt Config
     if args.username is not None:
         config["username"] = args.username
 
     if args.password is not None:
         config["password"] = args.password
 
+    verbosity = (
+        args.v
+        if args.v is not None
+        else config.get("verbosity", 3)
+    )
+
     forwarder = MQTTForwarder(
         config=config,
-        verbosity=args.v
+        verbosity=verbosity
     )
 
     forwarder.run()
